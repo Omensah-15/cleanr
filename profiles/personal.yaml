@@ -1,0 +1,41 @@
+# Personal finance tracking
+description: "For cleaning bank statements and personal finance CSV exports"
+
+trim_whitespace: true
+remove_duplicates: true
+normalize_columns: true
+drop_missing_rows: true  # Don't want incomplete transactions
+
+# Standardize column names for common banks
+rename_columns:
+  "Posting Date": "date"
+  "Transaction Date": "date"
+  "Description": "description"
+  "Memo": "description"
+  "Amount": "amount"
+  "Debit": "amount"
+  "Credit": "amount"
+  "Balance": "balance"
+
+keep_columns:
+  - date
+  - description
+  - amount
+  - balance
+  - category
+
+# Auto-categorize transactions
+categorization:
+  rules:
+    "AMAZON": "Shopping"
+    "WALMART": "Groceries"
+    "TARGET": "Shopping"
+    "STARBUCKS": "Coffee"
+    "UBER": "Transportation"
+    "LYFT": "Transportation"
+    "NETFLIX": "Entertainment"
+    "SPOTIFY": "Entertainment"
+
+output:
+  date_format: "%Y-%m-%d"
+  float_precision: 2
