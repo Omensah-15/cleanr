@@ -18,6 +18,20 @@ python3 y.py ./data/sales.csv
 python3 y.py ./data/sales.csv ./output/sales_clean.csv \
   --trim --dedup --normalize --fill "NA" --keep name,email
 ```
+| Flag           | Action                       |
+|----------------|------------------------------|
+| `--trim`       | Trim whitespace              |
+| `--dedup`      | Remove duplicates            |
+| `--normalize`  | Normalize column names       |
+| `--fill VALUE` | Fill missing values          |
+| `--drop-na`    | Drop rows with missing values|
+| `--keep COLS`  | Keep only these columns      |
+| `--drop COLS`  | Drop these columns           |
+| `--quick`      | Treat all columns as strings |
+| `--chunk SIZE` | Process in chunks            |
+| `--encoding`   | Force encoding               |
+
+
 Output
 
 · Defaults to <original>_clean.csv in the same folder.
