@@ -1,0 +1,48 @@
+# CleanR User Configuration
+# This file stores your personal preferences
+
+# Default settings
+defaults:
+  trim_whitespace: true
+  remove_duplicates: true
+  normalize_columns: true
+  fill_missing: ""
+  output_directory: "./cleaned"
+  encoding: "utf-8"
+
+# Performance
+performance:
+  chunk_size: 100000
+  quick_mode: false
+  memory_limit_mb: 1000
+
+# Display
+display:
+  show_progress: true
+  show_stats: true
+  colors: true
+  timestamp: true
+
+# File handling
+files:
+  backup_originals: false
+  timestamp_outputs: true
+  overwrite_existing: false
+
+# Shortcuts (aliases for common commands)
+shortcuts:
+  basic: "-t -d -n"
+  strict: "-t -d -n --drop-na"
+  minimal: "--trim --normalize"
+
+# Auto-profile detection (future feature)
+auto_detect:
+  sales:
+    patterns: ["*sales*", "*orders*", "*revenue*"]
+    profile: "sales"
+  finance:
+    patterns: ["*bank*", "*statement*", "*transaction*"]
+    profile: "finance"
+  users:
+    patterns: ["*users*", "*customers*", "*leads*"]
+    profile: "users"
