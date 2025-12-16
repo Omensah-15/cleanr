@@ -1,0 +1,53 @@
+# Sales data cleaning profile
+description: "For cleaning sales data exports from Shopify/WooCommerce"
+
+# Basic cleaning
+trim_whitespace: true
+remove_duplicates: true
+normalize_columns: true
+
+# Missing values
+fill_missing: "0"
+
+# Column handling
+keep_columns:
+  - order_id
+  - order_date
+  - customer_email
+  - product_sku
+  - quantity
+  - price
+  - total_amount
+  - payment_status
+
+# Renaming common sales columns
+rename_columns:
+  "Order ID": "order_id"
+  "Order Date": "order_date"
+  "Customer Email": "customer_email"
+  "SKU": "product_sku"
+  "Qty": "quantity"
+  "Price": "price"
+  "Total": "total_amount"
+  "Status": "payment_status"
+
+# Validation rules
+validation:
+  order_id:
+    required: true
+  customer_email:
+    required: true
+    pattern: "^[^@]+@[^@]+\.[^@]+$"
+  quantity:
+    min: 1
+    integer_only: true
+  price:
+    min: 0
+  total_amount:
+    min: 0
+
+# Output formatting
+output:
+  date_format: "%Y-%m-%d"
+  float_precision: 2
+  encoding: "utf-8"
