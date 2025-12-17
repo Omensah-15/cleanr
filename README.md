@@ -3,21 +3,7 @@
 Fast, memory-efficient Python tool to clean CSVs: trim whitespace, remove duplicates, normalize columns, handle missing data, and select/drop columns.
 
 ---
-
-## Quick Start
-
-```bash
-python3 y.py <input.csv> [output.csv] [options]# cleanr
-```
-## Examples:
-```bash
-# Basic cleaning
-python3 y.py ./data/sales.csv
-
-# With options
-python3 y.py ./data/sales.csv ./output/sales_clean.csv \
-  --trim --dedup --normalize --fill "NA" --keep name,email
-```
+## Features:
 | Flag | What it does |
 |------|--------------|
 | `--trim`       | Trim spaces |
@@ -31,8 +17,25 @@ python3 y.py ./data/sales.csv ./output/sales_clean.csv \
 | `--chunk SIZE` | Process in chunks |
 | `--encoding`   | Force encoding |
 
+## Usage
 
+```bash
+# Basic cleaning
+cleanr messy_data.csv
 
-Output
+# Full cleaning pipeline
+cleanr input.csv output.csv \
+  --trim --dedup --normalize \
+  --fill "NULL" --keep name,email,date
 
-· Defaults to <original>_clean.csv in the same folder.
+# For large files
+cleanr bigfile.csv --quick --chunk 50000
+```
+
+## Install
+
+1. Download cleanr.py
+2. Make executable: chmod +x cleanr.py
+3. Add alias: alias cleanr='python cleanr.py'
+
+License: MIT
