@@ -46,5 +46,5 @@ cleanr bigfile.csv --quick --chunk 50000
 ## 👨‍💻 Author
 
 **Developed by Mensah Obed**
-[heavenzlebron7@gmail.com](mailto:heavenzlebron7@gmail.com) 
+[Email](mailto:heavenzlebron7@gmail.com) 
 [LinkedIn](https://www.linkedin.com/in/obed-mensah-87001237b)
