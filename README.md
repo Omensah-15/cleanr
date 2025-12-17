@@ -40,7 +40,7 @@ cleanr bigfile.csv --quick --chunk 50000
 ## Demo:
 [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/Data/messy_data.csv) to [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/Data/messy_data_clean.csv) in secs
 #### Script demo:
-[](https://github.com/Omensah-15/cleanr/blob/e7a9d460346e038a0a2e9e6ea704dfe606efb7bd/Data/bash_example.png)
+![image alt](https://github.com/Omensah-15/cleanr/blob/e7a9d460346e038a0a2e9e6ea704dfe606efb7bd/Data/bash_example.png)
 ## License: MIT
 
 ## 👨‍💻 Author
