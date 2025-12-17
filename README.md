@@ -38,7 +38,7 @@ cleanr bigfile.csv --quick --chunk 50000
 2. Make executable: chmod +x cleanr.py
 3. Add alias: alias cleanr='python cleanr.py'
 ## Demo:
-[messy_data]() to [clean_data]() in secs
+[messy_data.csv]() to [clean_data.csv]() in secs
 #### script demo:
 
 ## License: MIT
