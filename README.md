@@ -38,4 +38,4 @@ cleanr bigfile.csv --quick --chunk 50000
 2. Make executable: chmod +x cleanr.py
 3. Add alias: alias cleanr='python cleanr.py'
 
-License: MIT
+## License: MIT
