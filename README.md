@@ -37,10 +37,13 @@ cleanr bigfile.csv --quick --chunk 50000
 1. Download cleanr.py
 2. Make executable: chmod +x cleanr.py
 3. Add alias: alias cleanr='python cleanr.py'
-## Demo:
-[messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/Data/messy_data.csv) to [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/Data/messy_data_clean.csv) in secs
-#### Script demo:
+
+## Demo(installation + example):
 ![image alt](https://github.com/Omensah-15/cleanr/blob/e7a9d460346e038a0a2e9e6ea704dfe606efb7bd/Data/bash_example.png)
+
+### Results:
+[messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/Data/messy_data.csv) to [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/Data/messy_data_clean.csv) in secs
+
 ## License: MIT
 
 ## 👨‍💻 Author
