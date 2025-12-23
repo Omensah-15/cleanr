@@ -18,7 +18,7 @@
 | `--encoding`   | Force encoding |
 
 
-## One-Command Installation
+## Quick Start
 
 ### For Windows PowerShell:
 ```powershell
@@ -32,7 +32,7 @@ cleanr --help
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
 ```
 ## Examples:
-```cmd
+```bash
 # Clean a file
 cleanr messy.csv clean.csv --trim --dedup --normalize
 
