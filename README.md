@@ -20,9 +20,13 @@
 
 ## One-Command Installation
 
-### For Windows CMD:
-```cmd
-python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py').read().decode('utf-8'))" --help
+### For Windows PowerShell:
+```powershell
+# In PowerShell (run as admin if needed)
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o $env:USERPROFILE\cleanr.py
+function cleanr { python "$env:USERPROFILE\cleanr.py" $args }
+cleanr --help
 ```
 ### For Linux/Mac/Git Bash:
 ```bash
