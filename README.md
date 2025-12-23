@@ -20,12 +20,12 @@
 
 ## One-Command Installation
 
+### For Windows CMD:
 ```cmd
-# for Windows CMD:
 python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py').read().decode('utf-8'))" --help
 ```
+### For Linux/Mac/Git Bash:
 ```bash
-# For Linux/Mac/Git Bash:
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o ~/cleanr.py && echo "alias cleanr='python ~/cleanr.py'" >> ~/.bashrc && pip install pandas pyyaml numpy
 ```
 
