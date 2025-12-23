@@ -21,7 +21,7 @@
 ## One-Command Installation
 
 ```cmd
-# For Windows CMD:
+# for Windows CMD:
 python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py').read().decode('utf-8'))" --help
 ```
 ```bash
