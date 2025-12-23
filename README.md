@@ -31,6 +31,17 @@ cleanr --help
 ```bash
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
 ```
+## Examples:
+```
+# Clean a file
+cleanr messy.csv clean.csv --trim --dedup --normalize
+
+# Handle missing data  
+cleanr data.csv --fill "Unknown"
+
+# Large files
+cleanr large.csv --quick --chunk 100000
+```
 ## Dependencies:
 ```bash
 pip install pandas pyyaml numpy
