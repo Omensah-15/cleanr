@@ -17,32 +17,22 @@ Fast, memory-efficient Python tool to clean CSVs: trim whitespace, remove duplic
 | `--chunk SIZE` | Process in chunks |
 | `--encoding`   | Force encoding |
 
-## Usage
+
+## One-Command Installation
 
 ```bash
-# Basic cleaning
-cleanr messy_data.csv
+# Install and test CleanR in one line:
+curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
 
-# Full cleaning pipeline
-cleanr input.csv output.csv \
-  --trim --dedup --normalize \
-  --fill "NULL" --keep name,email,date
-
-# For large files
-cleanr bigfile.csv --quick --chunk 50000
-```
+# Or for permanent installation:
+curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o ~/cleanr.py && echo "alias cleanr='python ~/cleanr.py'" >> ~/.bashrc && pip install pandas pyyaml numpy
 
 ## Install
 
 1. Download cleanr.py
 2. Make executable: chmod +x cleanr.py
 3. Add alias: alias cleanr='python cleanr.py'
-
-## Demo(installation + example):
-![image alt](https://github.com/Omensah-15/cleanr/blob/e7a9d460346e038a0a2e9e6ea704dfe606efb7bd/Data/bash_example.png)
-
-### Results:
-[messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/Data/messy_data.csv) to [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/Data/messy_data_clean.csv) in secs
+```
 
 ## License: MIT
 
