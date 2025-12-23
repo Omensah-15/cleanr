@@ -22,7 +22,6 @@
 
 ### For Windows PowerShell:
 ```powershell
-# In PowerShell (run as admin if needed)
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o $env:USERPROFILE\cleanr.py
 function cleanr { python "$env:USERPROFILE\cleanr.py" $args }
