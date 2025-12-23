@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cleanr-tool"           # project's name on PyPI
+version = "0.1.0"              # version number
+authors = [
+  {name="Obed Mensah", email="heavenzlebron7@gmail.com"},
+]
+description = "A fast, memory-efficient CLI tool for cleaning CSV files."
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.7"
+
+# requirements
+dependencies = [
+    "pandas",
+    "numpy",
+    "pyyaml",
+]
+
+# making 'cleanr' a command-line tool.
+[project.scripts]
+cleanr = "cleanr.cleanr:main"
