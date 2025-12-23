@@ -20,7 +20,7 @@
 
 ## Quick Start
 
-**Just copy and paste this command in your terminal:**
+**Copy and paste this command to install and run CleanR:**
 
 ### For Windows PowerShell:
 ```powershell
