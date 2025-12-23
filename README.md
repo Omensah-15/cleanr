@@ -26,7 +26,7 @@ python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githu
 ```
 ### For Linux/Mac/Git Bash:
 ```bash
-curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o ~/cleanr.py && echo "alias cleanr='python ~/cleanr.py'" >> ~/.bashrc && pip install pandas pyyaml numpy
+curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
 ```
 
 ## License: MIT
