@@ -21,17 +21,11 @@ Fast, memory-efficient Python tool to clean CSVs: trim whitespace, remove duplic
 ## One-Command Installation
 
 ```bash
-# Install and test CleanR in one line:
+# Install and test CleanR:
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
 
 # Or for permanent installation:
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o ~/cleanr.py && echo "alias cleanr='python ~/cleanr.py'" >> ~/.bashrc && pip install pandas pyyaml numpy
-
-## Install
-
-1. Download cleanr.py
-2. Make executable: chmod +x cleanr.py
-3. Add alias: alias cleanr='python cleanr.py'
 ```
 
 ## License: MIT
