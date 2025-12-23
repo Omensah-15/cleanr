@@ -31,7 +31,10 @@ cleanr --help
 ```bash
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
 ```
-
+## Dependencies:
+```bash
+pip install pandas pyyaml numpy
+```
 ## License: MIT
 
 ## 👨‍💻 Author
