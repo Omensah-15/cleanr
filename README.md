@@ -32,7 +32,7 @@ cleanr --help
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
 ```
 ## Examples:
-```bash
+```cmd
 # Clean a file
 cleanr messy.csv clean.csv --trim --dedup --normalize
 
