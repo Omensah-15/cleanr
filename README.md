@@ -18,7 +18,7 @@
 | `--encoding`   | Force encoding |
 
 
-## Installation (Windows PowerShell)
+## Installation
 
 ### Step 1: Install Python
 Download and install Python from [python.org](https://www.python.org/downloads/).  
@@ -32,7 +32,6 @@ python -m pip install pandas pyyaml numpy
 ### Step 3: Install CleanR
 #### For Windows PowerShell:
 ```powershell
-# Installation script
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py" -OutFile "$env:USERPROFILE\cleanr.py"
 New-Item -ItemType Directory -Force -Path (Split-Path $PROFILE)
 "function cleanr { python `"`$env:USERPROFILE\cleanr.py`" `$args }" | Add-Content -Path $PROFILE
