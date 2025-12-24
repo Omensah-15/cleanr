@@ -17,18 +17,6 @@
 | `--chunk SIZE` | Process in chunks |
 | `--encoding`   | Force encoding |
 
-## Quick Start (Try Without Installing)
-Run CleanR directly from GitHub:
-
-**For Windows (PowerShell/CMD):**
-```powershell
-python -c "import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py').read().decode('utf-8'))" --help
-```
-For Linux/Mac/Git Bash:
-```bash
-curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
-```
-
 ## Installation
 
 ### Step 1: Install Python
