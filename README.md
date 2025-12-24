@@ -48,7 +48,10 @@ Write-Host "CleanR installed! Close and reopen PowerShell, then use: cleanr --he
 ```
 ### For Linux/Mac/Git Bash:
 ```bash
-curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py | python3 - --help
+curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o ~/cleanr.py
+echo "alias cleanr='python ~/cleanr.py'" >> ~/.bashrc
+source ~/.bashrc
+# Then use: cleanr --help
 ```
 ## Examples:
 ```cmd
