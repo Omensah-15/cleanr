@@ -24,27 +24,12 @@
 
 ### For Windows PowerShell:
 ```powershell
-# CleanR PowerShell Installation
-# Run this once to install permanently
-
-# 1. Download the script
+# Installation script
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py" -OutFile "$env:USERPROFILE\cleanr.py"
-
-# 2. Create profile directory if it doesn't exist
 New-Item -ItemType Directory -Force -Path (Split-Path $PROFILE)
-
-# 3. Add cleanr function to profile
 "function cleanr { python `"`$env:USERPROFILE\cleanr.py`" `$args }" | Add-Content -Path $PROFILE
-
-# 4. Ensure profile loads on startup (registry fix)
-$registryPath = "HKCU:\Software\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell"
-$command = ". '$($PROFILE)'"
-Set-ItemProperty -Path $registryPath -Name "StartupScript" -Value $command -Type String -Force
-
-# 5. Set execution policy (if needed)
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
-
-Write-Host "CleanR installed! Close and reopen PowerShell, then use: cleanr --help"
+# Close and reopen PowerShell. Then use: cleanr --help
 ```
 ### For Linux/Mac/Git Bash:
 ```bash
