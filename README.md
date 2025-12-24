@@ -43,30 +43,9 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
 curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o ~/cleanr.py
 echo "alias cleanr='python ~/cleanr.py'" >> ~/.bashrc
 source ~/.bashrc
-# Then use: cleanr --help
 ```
 #### Close and reopen the terminal. Then use: cleanr --help
 
-## Quick Start
-
-**Copy and paste this command in your terminal to install and run CleanR:**
-
-### For Windows PowerShell:
-```powershell
-# Installation script
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py" -OutFile "$env:USERPROFILE\cleanr.py"
-New-Item -ItemType Directory -Force -Path (Split-Path $PROFILE)
-"function cleanr { python `"`$env:USERPROFILE\cleanr.py`" `$args }" | Add-Content -Path $PROFILE
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
-# Close and reopen PowerShell. Then use: cleanr --help
-```
-### For Linux/Mac/Git Bash:
-```bash
-curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o ~/cleanr.py
-echo "alias cleanr='python ~/cleanr.py'" >> ~/.bashrc
-source ~/.bashrc
-# Then use: cleanr --help
-```
 ## Examples:
 ```cmd
 # Clean a file
@@ -78,10 +57,7 @@ cleanr data.csv --fill "Unknown"
 # Large files
 cleanr large.csv --quick --chunk 100000
 ```
-## Dependencies:
-```bash
-pip install pandas pyyaml numpy
-```
+
 ## License: MIT
 
 ## 👨‍💻 Author
