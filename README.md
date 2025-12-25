@@ -18,7 +18,7 @@
 | `--encoding`   | Force encoding |
 
 ## Demo:
-![image alt](https://github.com/Omensah-15/cleanr/blob/733e99aa8defcf62395b5c2e77d8ebe38f505c88/demo/DemoPowershell.png)
+![image alt](https://github.com/Omensah-15/cleanr/blob/f87ed56ea67aecfc4af628bdb09a1ed34bae5a74/demo/demo_screenshot.png)
 - Before: [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/examples/messy_data.csv)
 - After: [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/examples/clean_data.csv)
 
