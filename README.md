@@ -44,6 +44,11 @@ source ~/.bashrc
 ```
 #### Close and reopen the terminal. Then use: cleanr --help
 
+## Demo: Real-World Cleaning
+
+Before: [messy_data.csv]
+After: [clean_data.csv]
+
 ## Examples:
 ```cmd
 # Clean a file
