@@ -47,18 +47,20 @@ curl -sL https://raw.githubusercontent.com/Omensah-15/cleanr/main/cleanr.py -o ~
 echo "alias cleanr='python ~/cleanr.py'" >> ~/.bashrc
 source ~/.bashrc
 ```
-#### Close and reopen the terminal. Then use: cleanr --help
-
-## Examples:
+#### Close and reopen the terminal. Then use: 
+```bash
+cleanr --help
+```
+## Usage & Examples:
 ```cmd
-# Clean a file
-cleanr messy.csv clean.csv --trim --dedup --normalize
+# Standard cleanup: trim spaces, remove duplicates, fix column names
+cleanr messy.csv cleaned.csv --trim --dedup --normalize
 
 # Handle missing data  
 cleanr data.csv --fill "Unknown"
 
-# Large files
-cleanr large.csv --quick --chunk 100000
+# Process large files in chunks to avoid memory issues
+cleanr huge_logs.csv clean_logs.csv --chunk 100000 --quick
 ```
 
 ## License: MIT
