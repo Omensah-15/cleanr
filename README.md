@@ -45,7 +45,7 @@ source ~/.bashrc
 #### Close and reopen the terminal. Then use: cleanr --help
 
 ## Demo: Real-World Cleaning
-
+[!image](https://github.com/Omensah-15/cleanr/blob/733e99aa8defcf62395b5c2e77d8ebe38f505c88/demo/DemoPowershell.png)
 Before: [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/examples/messy_data.csv)
 After: [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/examples/clean_data.csv)
 
