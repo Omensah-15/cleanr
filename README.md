@@ -46,7 +46,7 @@ source ~/.bashrc
 
 ## Demo: Real-World Cleaning
 
-Before: [messy_data.csv]()
+Before: [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/examples/messy_data.csv)
 After: [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/examples/clean_data.csv)
 
 ## Examples:
