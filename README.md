@@ -1,6 +1,6 @@
 # CleanR - CSV Cleaner
 
-**One command to clean any CSV file.** Remove duplicates, fix formatting, normalize columns, and process large files—instantly.
+**One command to clean any CSV file.** Remove duplicates, fix formatting, normalize columns, and process large files instantly.
 
 ---
 ## Features:
