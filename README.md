@@ -18,7 +18,7 @@
 | `--encoding`   | Force encoding |
 
 ## Demo:
-![image alt](https://github.com/Omensah-15/cleanr/blob/f87ed56ea67aecfc4af628bdb09a1ed34bae5a74/demo/demo_screenshot.png)
+![image alt](https://github.com/Omensah-15/cleanr/blob/0056912278c287d77d71effebfdcca59e5aa17ca/demo/linux_screenshot.png)
 - Before: [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/examples/messy_data.csv)
 - After: [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/examples/clean_data.csv)
 
