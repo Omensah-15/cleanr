@@ -83,11 +83,17 @@ cleanr data.csv output.csv --drop-na
 # Process a large file in chunks
 cleanr huge_logs.csv clean_logs.csv --chunk 100000 --quick
 
+# Split a column
+cleanr input.csv output.csv --split full_name first,last " "
+
 # Keep only specific columns
 cleanr data.csv output.csv --keep id,name,email
 
 # Rename a column
 cleanr data.csv output.csv --rename old_name=new_name
+
+#Full pipeline in one line
+cleanr input.csv output.csv --trim --dedup --normalize --drop-na --split full_name first,last " " --add username=email --rename old_email:new_email --quick
 ```
 
 ---
