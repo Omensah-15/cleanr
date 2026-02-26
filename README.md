@@ -86,8 +86,6 @@ cleanr huge_logs.csv clean_logs.csv --chunk 100000 --quick
 # Split a full name column into first/last:
 cleanr input.csv output.csv --split full_name first,last " "
 
-# 
-
 # Keep only specific columns
 cleanr data.csv output.csv --keep id,name,email
 
