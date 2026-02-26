@@ -1,6 +1,6 @@
 # CleanR
 
-A lightweight command-line tool for cleaning CSV files. Trim whitespace, remove duplicates, normalize column names, and handle large files — all in one command.
+CleanR is a fast, memory-efficient, command-line CSV cleaner designed for data analysts, engineers, and anyone who wants to clean and prepare CSV data in seconds. Stop wasting time hunting through spreadsheet menus — CleanR automates everything with one command.
 
 ---
 
