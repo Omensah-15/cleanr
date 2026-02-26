@@ -1,57 +1,57 @@
 #!/usr/bin/env python3
 """
 CleanR - Professional CSV Cleaner
-Fast, memory-efficient, and robust CSV processing.
+Fast, memory-efficient, and robust CSV processing with advanced column operations.
 """
 
 import sys
-import os
 import time
 import argparse
-import warnings
+import functools
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import List, Optional, Dict
 
 import pandas as pd
 import numpy as np
-import yaml
+import warnings
 
 warnings.filterwarnings("ignore")
 
-SUPPORTED_ENCODINGS = ["utf-8", "latin1", "iso-8859-1", "cp1252", "utf-16", "utf-8-sig"]
-DEFAULT_CHUNK_SIZE = 100_000
 VERSION = "1.0.0"
+DEFAULT_CHUNK_SIZE = 100_000
+SUPPORTED_ENCODINGS = ["utf-8", "latin1", "iso-8859-1", "cp1252", "utf-16", "utf-8-sig"]
+
+
+def timer(func):
+    """Decorator that logs execution time of slow operations."""
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        start = time.time()
+        result = func(self, *args, **kwargs)
+        elapsed = time.time() - start
+        if elapsed > 0.1 and self.verbose:
+            label = func.__name__.replace("_", " ").title()
+            print(f"  {label}: {elapsed:.2f}s")
+        return result
+    return wrapper
 
 
 class CleanR:
-    """Main cleaning engine."""
+    """Main CSV cleaning engine."""
 
     def __init__(self, verbose: bool = True):
-        self.stats = {
+        self.verbose = verbose
+        self.stats: Dict = {
             "start_time": time.time(),
             "rows_processed": 0,
             "rows_removed": 0,
-            "memory_saved_mb": 0,
+            "memory_saved_mb": 0.0,
             "success": False,
         }
-        self.verbose = verbose
 
     def _log(self, message: str):
-        """Log message if verbose mode is enabled."""
         if self.verbose:
             print(message)
-
-    @staticmethod
-    def timer(func):
-        def wrapper(self, *args, **kwargs):
-            start = time.time()
-            result = func(self, *args, **kwargs)
-            elapsed = time.time() - start
-            if elapsed > 0.1 and self.verbose:
-                print(f"  {func.__name__.replace('_', ' ').title()}: {elapsed:.2f}s")
-            return result
-
-        return wrapper
 
     @timer
     def load_file(
@@ -61,125 +61,112 @@ class CleanR:
         quick: bool = False,
         chunk_size: Optional[int] = None,
     ) -> pd.DataFrame:
-        """Load CSV with encoding fallback."""
+        """Load CSV with encoding fallback and optional chunked reading."""
         if not filepath.exists():
             raise FileNotFoundError(f"Input file not found: {filepath}")
 
         encodings = [encoding] if encoding else SUPPORTED_ENCODINGS
-        last_error = None
+        last_error: Optional[Exception] = None
 
         for enc in encodings:
             try:
                 self._log(f"  Trying encoding: {enc}")
+                read_kwargs = dict(
+                    encoding=enc,
+                    dtype=str if quick else None,
+                    low_memory=False,
+                    on_bad_lines="skip",
+                )
                 if chunk_size and chunk_size > 0:
-                    chunks = []
-                    for chunk in pd.read_csv(
-                        filepath,
-                        encoding=enc,
-                        chunksize=chunk_size,
-                        dtype=str if quick else None,
-                        low_memory=False,
-                        on_bad_lines='skip'
-                    ):
-                        chunks.append(chunk)
-                    if chunks:
-                        df = pd.concat(chunks, ignore_index=True)
-                    else:
-                        raise ValueError("No data loaded from CSV")
+                    chunks = list(pd.read_csv(filepath, chunksize=chunk_size, **read_kwargs))
+                    df = pd.concat(chunks, ignore_index=True) if chunks else pd.DataFrame()
                 else:
-                    df = pd.read_csv(
-                        filepath,
-                        encoding=enc,
-                        dtype=str if quick else None,
-                        low_memory=False,
-                        on_bad_lines='skip'
-                    )
+                    df = pd.read_csv(filepath, **read_kwargs)
+
+                if df.empty:
+                    raise ValueError("No data loaded from CSV.")
 
                 self.stats["rows_processed"] = len(df)
                 self.stats["original_columns"] = len(df.columns)
-                self._log(f"  ✓ Loaded {len(df):,} rows, {len(df.columns)} columns using {enc}")
+                self._log(
+                    f"  Loaded {len(df):,} rows x {len(df.columns)} columns using {enc}"
+                )
                 return df
 
-            except (UnicodeDecodeError, pd.errors.ParserError) as e:
-                last_error = e
-                continue
-            except Exception as e:
-                last_error = e
+            except Exception as exc:
+                last_error = exc
                 continue
 
-        error_msg = f"Failed to read CSV with supported encodings. Last error: {last_error}"
-        raise ValueError(error_msg)
+        raise ValueError(f"Failed to read CSV. Last error: {last_error}")
 
     @timer
     def normalize_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Normalize column names to lowercase, underscore-separated identifiers."""
         self._log("  Normalizing column names...")
-        new_cols = []
-        seen = set()
+        new_cols: List[str] = []
+        seen: set = set()
 
         for i, col in enumerate(df.columns, start=1):
-            if pd.isna(col):
-                col = f"column_{i}"
+            col_str = str(col).strip() if col is not None else ""
+            if not col_str or col_str.lower() == "nan":
+                col_str = f"column_{i}"
             else:
-                col = str(col).strip().lower()
-                col = col.replace(" ", "_").replace("-", "_").replace(".", "_")
-                col = "".join(c for c in col if c.isalnum() or c == "_")
-                if not col:
-                    col = f"column_{i}"
+                col_str = (
+                    col_str.lower()
+                    .replace(" ", "_")
+                    .replace("-", "_")
+                    .replace(".", "_")
+                )
+                col_str = "".join(c for c in col_str if c.isalnum() or c == "_")
+                if not col_str:
+                    col_str = f"column_{i}"
 
-            base = col
-            count = 1
-            while col in seen:
-                col = f"{base}_{count}"
+            base, count = col_str, 1
+            while col_str in seen:
+                col_str = f"{base}_{count}"
                 count += 1
-
-            seen.add(col)
-            new_cols.append(col)
+            seen.add(col_str)
+            new_cols.append(col_str)
 
         df.columns = new_cols
-        self._log(f"  ✓ Normalized {len(new_cols)} columns")
+        self._log(f"  Normalized {len(new_cols)} column names")
         return df
 
     @timer
     def trim_whitespace(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Strip leading and trailing whitespace from all string columns."""
         self._log("  Trimming whitespace...")
-        cols = df.select_dtypes(include="object").columns
-        for col in cols:
+        str_cols = df.select_dtypes(include="object").columns
+        for col in str_cols:
             df[col] = df[col].astype(str).str.strip()
-        self._log(f"  ✓ Trimmed {len(cols)} columns")
         return df
 
     @timer
     def remove_duplicates(self, df: pd.DataFrame) -> pd.DataFrame:
-        self._log("  Removing duplicates...")
+        """Drop fully duplicate rows."""
         before = len(df)
         df = df.drop_duplicates()
         removed = before - len(df)
         self.stats["rows_removed"] += removed
-        if removed > 0:
-            self._log(f"  ✓ Removed {removed:,} duplicate rows")
-        else:
-            self._log("  ✓ No duplicates found")
+        if removed:
+            self._log(f"  Removed {removed:,} duplicate rows")
         return df
 
     @timer
     def handle_missing(
-        self,
-        df: pd.DataFrame,
-        fill_value: Optional[str],
-        drop_na: bool,
+        self, df: pd.DataFrame, fill_value: Optional[str], drop_na: bool
     ) -> pd.DataFrame:
+        """Drop or fill rows with missing values."""
         if drop_na:
-            self._log("  Dropping rows with missing values...")
             before = len(df)
             df = df.dropna()
             removed = before - len(df)
             self.stats["rows_removed"] += removed
-            if removed > 0:
-                self._log(f"  ✓ Removed {removed:,} rows with missing values")
+            if removed:
+                self._log(f"  Dropped {removed:,} rows with missing values")
         elif fill_value is not None:
-            self._log(f"  Filling missing values with: '{fill_value}'")
             df = df.fillna(fill_value)
-            self._log("  ✓ Filled missing values")
+            self._log(f"  Filled missing values with '{fill_value}'")
         return df
 
     @timer
@@ -189,350 +176,252 @@ class CleanR:
         keep: Optional[List[str]],
         drop: Optional[List[str]],
     ) -> pd.DataFrame:
+        """Keep or drop named columns."""
         if keep:
-            available_cols = [c for c in keep if c in df.columns]
-            missing_cols = [c for c in keep if c not in df.columns]
-            if missing_cols and self.verbose:
-                print(f"  ⚠ Warning: Columns not found: {', '.join(missing_cols)}")
-            df = df[available_cols]
-            self._log(f"  ✓ Kept {len(available_cols)} columns")
+            available = [c for c in keep if c in df.columns]
+            missing = [c for c in keep if c not in df.columns]
+            if missing:
+                self._log(f"  WARNING - Columns not found and skipped: {', '.join(missing)}")
+            df = df[available]
         elif drop:
             cols_to_drop = [c for c in drop if c in df.columns]
-            missing_cols = [c for c in drop if c not in df.columns]
-            if missing_cols and self.verbose:
-                print(f"  ⚠ Warning: Columns not found: {', '.join(missing_cols)}")
             df = df.drop(columns=cols_to_drop)
-            self._log(f"  ✓ Dropped {len(cols_to_drop)} columns")
         return df
 
     @timer
     def optimize_types(self, df: pd.DataFrame, quick: bool) -> pd.DataFrame:
+        """Downcast numeric types and categorize low-cardinality string columns."""
         if quick or len(df) < 1000:
             return df
 
-        self._log("  Optimizing data types...")
-        before = df.memory_usage(deep=True).sum() / 1e6
+        before_mb = df.memory_usage(deep=True).sum() / 1e6
 
-        # Convert object columns with low cardinality to category
         for col in df.select_dtypes(include="object").columns:
-            try:
-                unique_ratio = df[col].nunique(dropna=True) / max(len(df), 1)
-                if unique_ratio < 0.5:
-                    df[col] = df[col].astype("category")
-            except:
-                continue
+            ratio = df[col].nunique() / max(len(df), 1)
+            if ratio < 0.5:
+                df[col] = df[col].astype("category")
 
-        # Convert numeric columns to appropriate types
-        for col in df.select_dtypes(include=[np.number]).columns:
-            try:
-                col_min = df[col].min()
-                col_max = df[col].max()
-                
-                if pd.api.types.is_integer_dtype(df[col]):
-                    if col_min >= 0:
-                        if col_max < 256:
-                            df[col] = pd.to_numeric(df[col], downcast='unsigned')
-                        elif col_max < 65536:
-                            df[col] = pd.to_numeric(df[col], downcast='unsigned')
-                else:
-                    df[col] = pd.to_numeric(df[col], downcast='float')
-            except:
-                continue
+        for col in df.select_dtypes(include=np.number).columns:
+            if pd.api.types.is_integer_dtype(df[col]):
+                df[col] = pd.to_numeric(df[col], downcast="integer", errors="ignore")
+            elif pd.api.types.is_float_dtype(df[col]):
+                df[col] = pd.to_numeric(df[col], downcast="float", errors="ignore")
 
-        after = df.memory_usage(deep=True).sum() / 1e6
-        saved = before - after
-        if saved > 1:
-            self.stats["memory_saved_mb"] = round(saved, 2)
-            self._log(f"  ✓ Saved {saved:.1f} MB of memory")
+        after_mb = df.memory_usage(deep=True).sum() / 1e6
+        self.stats["memory_saved_mb"] = round(max(before_mb - after_mb, 0.0), 2)
+        return df
+
+    @timer
+    def split_column(
+        self,
+        df: pd.DataFrame,
+        column: str,
+        new_columns: List[str],
+        delimiter: str,
+    ) -> pd.DataFrame:
+        """Split a column by a delimiter into multiple named columns."""
+        if column not in df.columns:
+            raise ValueError(f"Column '{column}' not found for splitting.")
+
+        n = len(new_columns)
+        splits = df[column].astype(str).str.split(delimiter, n=n - 1, expand=True)
+
+        # Ensure splits has exactly n columns, padding with None if needed
+        for i in range(n):
+            df[new_columns[i]] = splits[i] if i in splits.columns else None
 
         return df
 
-    def load_profile(self, name: str, directory: Path) -> Dict:
-        """Load cleaning profile from YAML file."""
-        path = directory / f"{name}.yaml"
-        if not path.exists():
-            raise FileNotFoundError(f"Profile '{name}' not found at {path}")
-
-        with open(path, "r") as f:
-            return yaml.safe_load(f) or {}
+    @timer
+    def add_columns(self, df: pd.DataFrame, add_map: Dict[str, str]) -> pd.DataFrame:
+        """Add new columns as copies of existing columns."""
+        for new_col, source_col in add_map.items():
+            if source_col not in df.columns:
+                raise ValueError(
+                    f"Source column '{source_col}' not found; cannot create '{new_col}'."
+                )
+            df[new_col] = df[source_col]
+        return df
 
     @timer
-    def save_file(self, df: pd.DataFrame, output: Path, config: Dict):
-        """Save DataFrame to CSV file."""
-        try:
-            output.parent.mkdir(parents=True, exist_ok=True)
-            
-            save_config = {
-                'index': False,
-                'encoding': config.get("encoding", "utf-8"),
-            }
-            
-            if config.get("float_precision"):
-                save_config['float_format'] = f"%.{config['float_precision']}f"
-            
-            df.to_csv(output, **save_config)
-            self._log(f"  ✓ Saved to: {output}")
-            self.stats["output_file"] = str(output)
-        except Exception as e:
-            raise IOError(f"Failed to save file: {e}")
+    def rename_columns(
+        self, df: pd.DataFrame, rename_map: Dict[str, str]
+    ) -> pd.DataFrame:
+        """Rename columns using an old-to-new mapping."""
+        missing = [old for old in rename_map if old not in df.columns]
+        if missing:
+            raise ValueError(
+                f"Columns not found for renaming: {', '.join(missing)}"
+            )
+        return df.rename(columns=rename_map)
+
+    @timer
+    def save_file(
+        self, df: pd.DataFrame, output: Path, encoding: str = "utf-8"
+    ):
+        """Write the cleaned DataFrame to a CSV file."""
+        output.parent.mkdir(parents=True, exist_ok=True)
+        df.to_csv(output, index=False, encoding=encoding)
+        self._log(f"  Saved to: {output}")
 
     def clean(self, input_path: Path, output_path: Path, **opts) -> Dict:
-        """Main cleaning pipeline."""
+        """Run the full cleaning pipeline and return stats."""
         self._log(f"Input:  {input_path}")
         self._log(f"Output: {output_path}")
-        
-        try:
-            # Load file
-            df = self.load_file(
-                input_path,
-                encoding=opts.get("encoding"),
-                quick=opts.get("quick", False),
-                chunk_size=opts.get("chunk_size"),
+
+        df = self.load_file(
+            input_path,
+            encoding=opts.get("encoding"),
+            quick=opts.get("quick", False),
+            chunk_size=opts.get("chunk_size"),
+        )
+
+        if opts.get("normalize"):
+            df = self.normalize_columns(df)
+        if opts.get("trim"):
+            df = self.trim_whitespace(df)
+        if opts.get("dedup"):
+            df = self.remove_duplicates(df)
+
+        df = self.handle_missing(df, opts.get("fill"), opts.get("drop_na", False))
+
+        if opts.get("keep") or opts.get("drop"):
+            df = self.select_columns(df, opts.get("keep"), opts.get("drop"))
+
+        for split_args in opts.get("split") or []:
+            column, new_cols, delim = split_args
+            df = self.split_column(df, column, new_cols, delim)
+
+        if opts.get("add"):
+            df = self.add_columns(df, opts["add"])
+        if opts.get("rename"):
+            df = self.rename_columns(df, opts["rename"])
+
+        df = self.optimize_types(df, opts.get("quick", False))
+        self.save_file(df, output_path, encoding=opts.get("encoding", "utf-8"))
+
+        end_time = time.time()
+        self.stats.update(
+            {
+                "end_time": end_time,
+                "elapsed_time": round(end_time - self.stats["start_time"], 3),
+                "final_shape": df.shape,
+                "success": True,
+            }
+        )
+        return self.stats
+
+
+def _parse_kv_list(pairs: List[str], flag: str) -> Dict[str, str]:
+    """Parse a list of KEY=VALUE strings into a dict."""
+    result = {}
+    for pair in pairs:
+        if "=" not in pair:
+            print(
+                f"WARNING: Ignoring malformed {flag} argument '{pair}' (expected KEY=VALUE)",
+                file=sys.stderr,
             )
-
-            # Apply cleaning operations
-            if opts.get("normalize", False):
-                df = self.normalize_columns(df)
-
-            if opts.get("trim", False):
-                df = self.trim_whitespace(df)
-
-            if opts.get("dedup", False):
-                df = self.remove_duplicates(df)
-
-            df = self.handle_missing(df, opts.get("fill"), opts.get("drop_na", False))
-            
-            if opts.get("keep") or opts.get("drop"):
-                df = self.select_columns(df, opts.get("keep"), opts.get("drop"))
-            
-            df = self.optimize_types(df, opts.get("quick", False))
-
-            # Save result
-            self.save_file(df, output_path, opts)
-            
-            # Update statistics
-            self.stats["end_time"] = time.time()
-            self.stats["elapsed_time"] = self.stats["end_time"] - self.stats["start_time"]
-            self.stats["final_shape"] = df.shape
-            self.stats["success"] = True
-            
-            # Print summary
-            self._log("\n" + "="*50)
-            self._log("CLEANING SUMMARY")
-            self._log("="*50)
-            self._log(f"Original: {self.stats['rows_processed']:,} rows × {self.stats.get('original_columns', '?')} cols")
-            self._log(f"Final:    {df.shape[0]:,} rows × {df.shape[1]} cols")
-            self._log(f"Removed:  {self.stats['rows_removed']:,} rows total")
-            if self.stats.get('memory_saved_mb', 0) > 0:
-                self._log(f"Memory:   Saved {self.stats['memory_saved_mb']} MB")
-            self._log(f"Time:     {self.stats['elapsed_time']:.2f} seconds")
-            self._log("="*50)
-            
-            return self.stats
-            
-        except Exception as e:
-            self.stats["error"] = str(e)
-            self.stats["success"] = False
-            if self.verbose:
-                print(f"\n Error: {e}", file=sys.stderr)
-            raise
+            continue
+        k, _, v = pair.partition("=")
+        result[k.strip()] = v.strip()
+    return result
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(
-        description="CleanR - Professional CSV Cleaner",
+        description="CleanR v{} - Professional CSV Cleaner".format(VERSION),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  cleanr input.csv output.csv                    # Basic cleaning
-  cleanr data.csv --trim --dedup                 # Trim and remove duplicates
-  cleanr large.csv --quick --chunk 50000         # Process large files
-  cleanr messy.csv --normalize --fill "NA"       # Normalize and fill NA
-  cleanr sales.csv --keep "date,amount,name"     # Keep specific columns
-
-For more details, visit: https://github.com/Omensah-15/cleanr
-        """
     )
-    
-    parser.add_argument(
-        "--version",
-        action="version",
-        version=f"CleanR {VERSION}"
-    )
-    
-    parser.add_argument(
-        "input",
-        help="Input CSV file path"
-    )
-    
+    parser.add_argument("input", help="Input CSV file path")
     parser.add_argument(
         "output",
         nargs="?",
-        help="Output CSV file path (optional, defaults to input_clean.csv)"
+        help="Output CSV file path (default: <input>_clean.csv)",
     )
-    
-    # Cleaning options
+    parser.add_argument("-t", "--trim", action="store_true", help="Trim whitespace from string columns")
+    parser.add_argument("-d", "--dedup", action="store_true", help="Remove duplicate rows")
+    parser.add_argument("-n", "--normalize", action="store_true", help="Normalize column names to snake_case")
+    parser.add_argument("-f", "--fill", metavar="VALUE", help="Fill missing values with VALUE")
+    parser.add_argument("--drop-na", action="store_true", help="Drop rows that contain any missing value")
+    parser.add_argument("--keep", metavar="COL1,COL2", help="Comma-separated list of columns to keep")
+    parser.add_argument("--drop", metavar="COL1,COL2", help="Comma-separated list of columns to drop")
+    parser.add_argument("--quick", action="store_true", help="Skip type optimization (faster for large files)")
+    parser.add_argument("--chunk", type=int, metavar="N", help="Read file in chunks of N rows")
+    parser.add_argument("--encoding", metavar="ENC", help="Force a specific file encoding (e.g. utf-8, latin1)")
+    parser.add_argument("--quiet", action="store_true", help="Suppress progress output")
     parser.add_argument(
-        "-t", "--trim",
-        action="store_true",
-        help="Trim whitespace from all string columns"
+        "--split",
+        nargs=3,
+        action="append",
+        metavar=("COLUMN", "NEW_COLUMNS", "DELIM"),
+        help="Split COLUMN on DELIM into NEW_COLUMNS (comma-separated names). Repeatable.",
     )
-    
     parser.add_argument(
-        "-d", "--dedup",
-        action="store_true",
-        help="Remove duplicate rows"
+        "--add",
+        nargs="+",
+        metavar="NEW=OLD",
+        help="Add column(s) as copies of existing columns (NEW=OLD pairs).",
     )
-    
     parser.add_argument(
-        "-n", "--normalize",
-        action="store_true",
-        help="Normalize column names (lowercase, underscores)"
+        "--rename",
+        nargs="+",
+        metavar="OLD=NEW",
+        help="Rename column(s) (OLD=NEW pairs).",
     )
-    
-    parser.add_argument(
-        "-f", "--fill",
-        metavar="VALUE",
-        help="Fill missing values with specified value"
-    )
-    
-    parser.add_argument(
-        "--drop-na",
-        action="store_true",
-        help="Drop rows with any missing values"
-    )
-    
-    parser.add_argument(
-        "--keep",
-        metavar="COLUMNS",
-        help="Keep only specified columns (comma-separated)"
-    )
-    
-    parser.add_argument(
-        "--drop",
-        metavar="COLUMNS",
-        help="Drop specified columns (comma-separated)"
-    )
-    
-    # Performance options
-    parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Quick mode (skip type optimization for faster processing)"
-    )
-    
-    parser.add_argument(
-        "--chunk",
-        type=int,
-        metavar="SIZE",
-        help=f"Process in chunks (default: {DEFAULT_CHUNK_SIZE})"
-    )
-    
-    parser.add_argument(
-        "--encoding",
-        help=f"File encoding (default: auto-detect from {', '.join(SUPPORTED_ENCODINGS[:3])}...)"
-    )
-    
-    parser.add_argument(
-        "--quiet",
-        action="store_true",
-        help="Quiet mode (minimal output)"
-    )
-    
-    parser.add_argument(
-        "--profile",
-        metavar="NAME",
-        help="Use cleaning profile from YAML file"
-    )
-    
+
     args = parser.parse_args()
-    
-    # Validate arguments
-    if args.fill and args.drop_na:
-        print("Error: Cannot use both --fill and --drop-na options together", file=sys.stderr)
-        return 1
-    
-    if args.keep and args.drop:
-        print("Error: Cannot use both --keep and --drop options together", file=sys.stderr)
-        return 1
-    
-    # Process file paths
+
     input_path = Path(args.input).resolve()
-    if not input_path.exists():
-        print(f"Error: Input file not found: {input_path}", file=sys.stderr)
-        return 1
-    
-    if args.output:
-        output_path = Path(args.output).resolve()
-    else:
-        # Default output: input_clean.csv in same directory
-        output_path = input_path.with_name(f"{input_path.stem}_clean{input_path.suffix}")
-    
-    # Check if output file already exists
-    if output_path.exists() and output_path != input_path:
-        print(f"Warning: Output file already exists: {output_path}", file=sys.stderr)
-        response = input("Overwrite? (y/N): ").strip().lower()
-        if response != 'y':
-            print("Operation cancelled", file=sys.stderr)
-            return 0
-    
-    # Initialize cleaner
+    output_path = (
+        Path(args.output).resolve()
+        if args.output
+        else input_path.with_name(f"{input_path.stem}_clean{input_path.suffix}")
+    )
+
     cleaner = CleanR(verbose=not args.quiet)
-    
+
+    opts: Dict = {
+        "trim": args.trim,
+        "dedup": args.dedup,
+        "normalize": args.normalize,
+        "fill": args.fill,
+        "drop_na": args.drop_na,
+        "quick": args.quick,
+        "chunk_size": args.chunk or DEFAULT_CHUNK_SIZE,
+        "encoding": args.encoding,
+    }
+
+    if args.keep:
+        opts["keep"] = [c.strip() for c in args.keep.split(",") if c.strip()]
+    if args.drop:
+        opts["drop"] = [c.strip() for c in args.drop.split(",") if c.strip()]
+    if args.split:
+        opts["split"] = [
+            (col, new_cols.split(","), delim) for col, new_cols, delim in args.split
+        ]
+    if args.add:
+        opts["add"] = _parse_kv_list(args.add, "--add")
+    if args.rename:
+        opts["rename"] = _parse_kv_list(args.rename, "--rename")
+
     try:
-        # Prepare options
-        clean_opts = {
-            "trim": args.trim,
-            "dedup": args.dedup,
-            "normalize": args.normalize,
-            "fill": args.fill,
-            "drop_na": args.drop_na,
-            "quick": args.quick,
-            "chunk_size": args.chunk or DEFAULT_CHUNK_SIZE,
-            "encoding": args.encoding,
-        }
-        
-        # Process keep/drop columns
-        if args.keep:
-            clean_opts["keep"] = [col.strip() for col in args.keep.split(",")]
-        if args.drop:
-            clean_opts["drop"] = [col.strip() for col in args.drop.split(",")]
-        
-        # Load profile if specified
-        if args.profile:
-            try:
-                profile_dir = Path.home() / ".cleanr" / "profiles"
-                profile_config = cleaner.load_profile(args.profile, profile_dir)
-                clean_opts.update(profile_config)
-            except Exception as e:
-                print(f"Warning: Could not load profile '{args.profile}': {e}", file=sys.stderr)
-        
-        # Run cleaning
-        stats = cleaner.clean(
-            input_path=input_path,
-            output_path=output_path,
-            **clean_opts
-        )
-        
-        if stats["success"]:
-            if not args.quiet:
-                print(f"\n Cleaning completed successfully!")
-                print(f"   Output: {output_path}")
-            return 0
-        else:
-            print(f"\n Cleaning failed: {stats.get('error', 'Unknown error')}", file=sys.stderr)
-            return 1
-            
-    except KeyboardInterrupt:
-        print("\n⚠ Operation cancelled by user", file=sys.stderr)
-        return 1
-    except Exception as e:
-        print(f"\n Error during cleaning: {e}", file=sys.stderr)
-        if not args.quiet:
-            import traceback
-            traceback.print_exc()
+        stats = cleaner.clean(input_path, output_path, **opts)
+    except Exception as exc:
+        print(f"Error: {exc}", file=sys.stderr)
         return 1
 
+    if stats["success"]:
+        rows, cols = stats["final_shape"]
+        elapsed = stats.get("elapsed_time", 0)
+        print(
+            f"Done. {output_path} | {rows:,} rows x {cols} cols | {elapsed:.2f}s"
+        )
+        if stats.get("memory_saved_mb"):
+            print(f"Memory saved by type optimization: {stats['memory_saved_mb']} MB")
+        return 0
+
+    print("Cleaning failed.", file=sys.stderr)
+    return 1
 
 
 if __name__ == "__main__":
