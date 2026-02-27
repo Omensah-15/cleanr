@@ -4,6 +4,15 @@ CleanR is a fast, memory-efficient, command-line CSV cleaner designed for data a
 
 ---
 
+## Demo
+
+![Demo](https://github.com/Omensah-15/cleanr/blob/425bdb64ff60d45a1e4d802225476e4a60b34308/demo/demo2.gif)
+
+- Before: [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/demo/examples/messy_data.csv)
+- After: [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/demo/examples/clean_data.csv)
+
+---
+
 ## Installation
 
 **Requirements:** Python 3.7+ with pandas and numpy.
@@ -95,15 +104,6 @@ cleanr data.csv output.csv --rename old_name=new_name
 #Full pipeline in one line
 cleanr input.csv output.csv --trim --dedup --normalize --drop-na --split full_name first,last " " --add username=email --rename old_email:new_email --quick
 ```
-
----
-
-## Demo
-
-![Demo](https://github.com/Omensah-15/cleanr/blob/425bdb64ff60d45a1e4d802225476e4a60b34308/demo/demo2.gif)
-
-- Before: [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/demo/examples/messy_data.csv)
-- After: [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/demo/examples/clean_data.csv)
 
 ---
 
