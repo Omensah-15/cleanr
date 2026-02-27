@@ -100,7 +100,7 @@ cleanr input.csv output.csv --trim --dedup --normalize --drop-na --split full_na
 
 ## Demo
 
-![Screenshot](https://github.com/Omensah-15/cleanr/blob/0056912278c287d77d71effebfdcca59e5aa17ca/demo/linux_screenshot.png)
+![Demo](https://github.com/Omensah-15/cleanr/blob/425bdb64ff60d45a1e4d802225476e4a60b34308/demo/demo2.gif)
 
 - Before: [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/demo/examples/messy_data.csv)
 - After: [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/demo/examples/clean_data.csv)
