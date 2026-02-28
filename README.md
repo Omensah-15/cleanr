@@ -5,7 +5,9 @@ CleanR is a fast, memory-efficient, command-line CSV cleaner designed for data a
 ---
 
 ## Demo
-<img src="https://github.com/Omensah-15/cleanr/blob/425bdb64ff60d45a1e4d802225476e4a60b34308/demo/demo2.gif" alt="Demo" width="800">
+<div align="center">
+  <img src="https://github.com/Omensah-15/cleanr/blob/425bdb64ff60d45a1e4d802225476e4a60b34308/demo/demo2.gif" alt="Demo" width="800">
+</div>
 
 - Before: [messy_data.csv](https://github.com/Omensah-15/cleanr/blob/main/demo/examples/messy_data.csv)
 - After: [clean_data.csv](https://github.com/Omensah-15/cleanr/blob/main/demo/examples/clean_data.csv)
